@@ -1,0 +1,219 @@
+
+<head>
+	<title>Strat</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+	{{> display}}
+</body>
+
+<template name="display">
+	<div class="container">
+		<div class="row">
+			<div class="span2">{{> cts}}</div>
+			<div class="span2">{{> gmCash}}</div>
+			<div class="span2">{{> gmPercent}}</div>
+			<div class="span2">{{> Trend}}</div>
+			<div class="span2">{{> COVO}}</div>
+			<div class="span2">{{> COVL}}</div>
+		</div>
+		<div class="row">
+			<div class="span4 offset2">{{> gmGroup}}</div>
+		</div>
+		<br /><br />
+		<div class="row">
+			<div class="span10">{{> customers}}</div>
+		</div>
+	</div>
+</template>
+
+<template name="cts">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">CTS</th></tr>
+		<tr><th>CTS Score:</th><th>{{ctsScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_Asc_Edit}}
+			{{else}}
+				{{> Rank_Asc}}
+			{{/if}}
+			<tr><td>Rank:</td><td>{{calcRankAsc ctsScore 'cts'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="gmCash">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">GM$</th></tr>
+		<tr><th>GM$ Score:</th><th>{{gmCashScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_None_Edit}}
+			{{else}}
+				{{> Rank_None}}
+				<tr><td>Rank:</td><td>{{matchGMCashRank gmCashId}}</td></tr>
+			{{/if}}
+		{{/with}}
+	</table>
+</template>
+
+<template name="gmPercent">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">GM%</th></tr>
+		<tr><th>GM% Score:</th><th>{{gmPercentScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_Desc_Edit}}
+			{{else}}
+				{{> Rank_Desc}}
+			{{/if}}
+			<tr><td>Rank:</td><td>{{calcRankDesc gmPercentScore 'gmPercent'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="Trend">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">Trend%</th></tr>
+		<tr><th>Trend% Score:</th><th>{{trendScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_Desc_Edit}}
+			{{else}}
+				{{> Rank_Desc}}
+			{{/if}}
+			<tr><td>Rank:</td><td>{{calcRankDesc trendScore 'Trend'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="COVO">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">COVO</th></tr>
+		<tr><th>COVO Score:</th><th>{{COVOScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_Asc_Edit}}
+			{{else}}
+				{{> Rank_Asc}}
+			{{/if}}
+			<tr><td>Rank:</td><td>{{calcRankAsc COVOScore 'COVO'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="COVL">
+	<table class="table table-condensed table-bordered">
+		<tr><th colspan="2">COVL</th></tr>
+		<tr><th>COVL Score:</th><th>{{COVLScore}}</th></tr>
+		{{#with profile}}
+			{{#if editing}}
+				{{> Rank_Asc_Edit}}
+			{{else}}
+				{{> Rank_Asc}}
+			{{/if}}
+			<tr><td>Rank:</td><td>{{calcRankAsc COVLScore 'COVL'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="gmGroup">
+	<table class="table table-condensed table-bordered">
+		{{#with profile}}
+			{{#if editing}}
+				<tr>
+					<td><input type="text" id="A" value="{{A}}" /></td>
+					<td><input type="text" id="B" value="{{B}}" /></td>
+				</tr>
+				<tr><td colspan="2">
+					<button type="button" class="btn btn-info save">Save</button>
+				</td></tr> 
+			{{else}}
+				<tr>
+					<td class="profile">{{A}}%</td>
+					<td class="profile">{{B}}%</td>
+				</tr>		
+			{{/if}}
+			<tr><td colspan="2">Rank: {{calcGroupRank selected 'gmGroup' 'gmCashRank,gmPercentRank'}}</td></tr>
+		{{/with}}
+	</table>
+</template>
+
+<template name="customers">
+	<table class="table table-hover table-bordered">
+			<tr>
+				<th>Customer Name</th>
+				<th colspan="2">CTS</th>
+				<th colspan="2">GM$</th>
+				<th colspan="2">GM%</th>
+				<th colspan="2">Trend%</th>
+				<th colspan="2">COVO</th>
+				<th colspan="2">COVL</th>
+			</tr>
+			<tbody>
+		{{#each customer}}
+			<tr class="selectedCustomer {{selected}}" id="{{_id}}">
+				<td>{{name}}</td>
+				<td>{{cts}}</td><td>{{calcRankAsc cts 'cts'}}</td>
+				<td>${{gmCash}}</td><td>{{matchGMCashRank gmCashId}}</td>
+				<td>{{gmPercent}}%</td><td>{{calcRankDesc gmPercent 'gmPercent'}}</td>
+				<td>{{Trend}}%</td><td>{{calcRankDesc Trend 'Trend'}}</td>
+				<td>{{COVO}}%</td><td>{{calcRankAsc COVO 'COVO'}}</td>
+				<td>{{COVL}}%</td><td>{{calcRankAsc COVL 'COVL'}}</td>
+			</tr>
+		{{/each}}
+	</tbody>
+	</table>
+</template>
+
+<template name="Rank_Asc_Edit">
+	<tr><td>A &#60;&#61;</td><td><input type="text" id="A" value="{{A}}" /></td></tr>
+	<tr><td>B &#60;&#61;</td><td><input type="text" id="B" value="{{B}}" /></td></tr>
+	<tr><td>C &#60;&#61;</td><td><input type="text" id="C" value="{{C}}" /></td></tr>
+	<tr><td>D &#62;</td><td><input type="text" id="D" value="{{D}}" /></td></tr>
+	<tr><td colspan="2" style="text-align: center">
+		<button type="button" class="btn btn-info save">Save</button>
+	</td></tr>
+</template>
+
+<template name="Rank_Asc">
+	<tr><td>A &#60;&#61;</td><td class="profile">{{A}}</td></tr>
+	<tr><td>B &#60;&#61;</td><td class="profile">{{B}}</td></tr>
+	<tr><td>C &#60;&#61;</td><td class="profile">{{C}}</td></tr>
+	<tr><td>D &#62;</td><td class="profile">{{D}}</td></tr>
+</template>
+
+<template name="Rank_Desc_Edit">
+	<tr><td>A &#60;&#61;</td><td><input type="text" id="A" value="{{A}}" /></td></tr>
+	<tr><td>B &#60;&#61;</td><td><input type="text" id="B" value="{{B}}" /></td></tr>
+	<tr><td>C &#60;&#61;</td><td><input type="text" id="C" value="{{C}}" /></td></tr>
+	<tr><td>D &#62;</td><td><input type="text" id="D" value="{{D}}" /></td></tr>
+	<tr><td colspan="2" style="text-align: center">
+		<button type="button" class="btn btn-info save">Save</button>
+	</td></tr>
+</template>
+
+<template name="Rank_Desc">
+	<tr><td>A &#62;&#61;</td><td class="profile">{{A}}%</td></tr>
+	<tr><td>B &#62;&#61;</td><td class="profile">{{B}}%</td></tr>
+	<tr><td>C &#62;&#61;</td><td class="profile">{{C}}%</td></tr>
+	<tr><td>D &#60;</td><td class="profile">{{D}}%</td></tr>
+</template>
+
+<template name="Rank_None_Edit">
+	<tr><td>A </td><td><input type="text" id="A" value="{{A}}" /></td></tr>
+	<tr><td>B </td><td><input type="text" id="B" value="{{B}}" /></td></tr>
+	<tr><td>C </td><td><input type="text" id="C" value="{{C}}" /></td></tr>
+	<tr><td>D </td><td><input type="text" id="D" value="{{D}}" /></td></tr>
+	<tr><td colspan="2" style="text-align: center">
+		<button type="button" class="btn btn-info save">Save</button>
+	</td></tr>
+</template>
+
+<template name="Rank_None">
+	<tr><td>A </td><td class="profile">{{A}}%</td></tr>
+	<tr><td>B </td><td class="profile">{{B}}%</td></tr>
+	<tr><td>C </td><td class="profile">{{C}}%</td></tr>
+	<tr><td>D </td><td class="profile">{{D}}%</td></tr>
+</template>
