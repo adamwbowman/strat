@@ -23,11 +23,6 @@ Session.setDefault('gmGroupRank', null);
 Session.setDefault('COVORank', null);
 Session.setDefault('COVLRank', null);
 
-//////////////////////////////////////////////////////////////////////////////////
-// Meteor Calls...
-Meteor.call('calcRankThenScore', 'gmCash', function(err, result) {
-    Session.set('gmCashArray', result);
-});
 
 //////////////////////////////////////////////////////////////////////////////////
 // Display (these events apply to all child templates)
@@ -56,6 +51,7 @@ Template.cts.helpers({
 	profile: function () {
 		return Profile.findOne({type: 'cts'});
 	},
+	// Returns value from customer selection
 	ctsScore: function () {
 		return Session.get('ctsScore');
 	}
@@ -73,20 +69,13 @@ Template.gmCash.helpers({
 	gmCashId: function () {
 		return Session.get('gmCashId');
 	},
-	gmCashRank: function () {
-		return Session.get('gmCashRank');
-	},
-	gmCashArray: function () {
-		return Session.get('gmCashArray');
-	}
-});
-
-Template.gmCash.events({
-	'click .save': function () {
-		Meteor.call('calcRankThenScore', 'gmCash', function(err, result) {
-		    Session.set('gmCashArray', result);
-		});
-	}
+//	gmCashRank: function () {
+//		return Session.get('gmCashRank');
+//	},
+//	gmCashArray: function () {
+//		console.log('gmCashArray')
+//		return Session.get('gmCashArray');
+//	}
 });
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -169,10 +158,7 @@ Template.customers.helpers({
 		if (this._id == Session.get('selectedCustomer')) {
 			return 'info';
 		}
-	},
-	gmCashArray: function () {
-		return Session.get('gmCashArray');
-	}	
+	}
 });
 
 Template.customers.events({
@@ -230,6 +216,40 @@ Handlebars.registerHelper('calcRankDesc', function(profileScore, profileName) {
 		Session.set(profileNameRank, 'D');
 		return 'D'
 	}
+});
+
+Handlebars.registerHelper('calcRankThenScore', function(profileName) {
+	var profileColl = Profile.find({type: profileName}).fetch();
+	var customerColl = Customers.find().fetch();
+	var customerTotal = 0;
+	var runningTotal = 0;
+
+	customerColl = _.chain(customerColl).sortBy(profileName).reverse().value();
+
+	var customerValues = _.pluck(customerColl, profileName);
+	for (i=0; i < customerValues.length; ++i) {
+		customerTotal = (customerTotal + customerValues[i]);
+	}
+
+	var arrScore = [];
+	var strVal;
+
+	_.each(customerValues, function (num, i) {
+		if (runningTotal <= (customerTotal * (profileColl[0].A/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'A']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'B']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B + profileColl[0].C)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'C']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B + profileColl[0].C + profileColl[0].D)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'D']);
+		}
+	});
+	Session.set(profileName+'Array', arrScore);
 });
 
 Handlebars.registerHelper('editing', function() {

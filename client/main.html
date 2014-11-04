@@ -52,7 +52,7 @@
 				{{> Rank_None_Edit}}
 			{{else}}
 				{{> Rank_None}}
-				<tr><td>Rank:</td><td>{{matchGMCashRank gmCashId}}</td></tr>
+				<tr><td>Rank:</td><td>{{calcRankThenScore 'gmCash'}}{{matchGMCashRank gmCashId}}</td></tr>
 			{{/if}}
 		{{/with}}
 	</table>
