@@ -52,7 +52,7 @@
 				{{> Rank_None_Edit}}
 			{{else}}
 				{{> Rank_None}}
-				<tr><td>Rank:</td><td>{{calcRankThenScore 'gmCash'}}{{matchGMCashRank gmCashId}}</td></tr>
+				<tr><td>Rank:</td><td>{{calcRankThenScore 'gmCash'}}{{gmCashRank}}</td></tr>
 			{{/if}}
 		{{/with}}
 	</table>
@@ -142,28 +142,28 @@
 
 <template name="customers">
 	<table class="table table-hover table-bordered">
-			<tr>
-				<th>Customer Name</th>
-				<th colspan="2">CTS</th>
-				<th colspan="2">GM$</th>
-				<th colspan="2">GM%</th>
-				<th colspan="2">Trend%</th>
-				<th colspan="2">COVO</th>
-				<th colspan="2">COVL</th>
-			</tr>
-			<tbody>
+		<tr>
+			<th>Customer Name</th>
+			<th colspan="2">CTS</th>
+			<th colspan="2">GM$</th>
+			<th colspan="2">GM%</th>
+			<th colspan="2">Trend%</th>
+			<th colspan="2">COVO</th>
+			<th colspan="2">COVL</th>
+		</tr>
+		<tbody>
 		{{#each customer}}
 			<tr class="selectedCustomer {{selected}}" id="{{_id}}">
 				<td>{{name}}</td>
 				<td>{{cts}}</td><td>{{calcRankAsc cts 'cts'}}</td>
-				<td>${{gmCash}}</td><td>{{matchGMCashRank gmCashId}}</td>
+				<td>${{gmCash}}</td><td>{{matchIdToRank 'gmCash' this._id}}</td>
 				<td>{{gmPercent}}%</td><td>{{calcRankDesc gmPercent 'gmPercent'}}</td>
 				<td>{{Trend}}%</td><td>{{calcRankDesc Trend 'Trend'}}</td>
 				<td>{{COVO}}%</td><td>{{calcRankAsc COVO 'COVO'}}</td>
 				<td>{{COVL}}%</td><td>{{calcRankAsc COVL 'COVL'}}</td>
 			</tr>
 		{{/each}}
-	</tbody>
+		</tbody>
 	</table>
 </template>
 

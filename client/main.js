@@ -23,6 +23,10 @@ Session.setDefault('gmGroupRank', null);
 Session.setDefault('COVORank', null);
 Session.setDefault('COVLRank', null);
 
+//Meteor.startup(function () {
+//	console.log('*** startup called');
+//	xxx('gmCash');
+//});
 
 //////////////////////////////////////////////////////////////////////////////////
 // Display (these events apply to all child templates)
@@ -69,11 +73,10 @@ Template.gmCash.helpers({
 	gmCashId: function () {
 		return Session.get('gmCashId');
 	},
-//	gmCashRank: function () {
-//		return Session.get('gmCashRank');
-//	},
+	gmCashRank: function () {
+		return Session.get('gmCashRank');
+	},
 //	gmCashArray: function () {
-//		console.log('gmCashArray')
 //		return Session.get('gmCashArray');
 //	}
 });
@@ -219,6 +222,7 @@ Handlebars.registerHelper('calcRankDesc', function(profileScore, profileName) {
 });
 
 Handlebars.registerHelper('calcRankThenScore', function(profileName) {
+console.log('*** registeredHelper called');
 	var profileColl = Profile.find({type: profileName}).fetch();
 	var customerColl = Customers.find().fetch();
 	var customerTotal = 0;
@@ -250,26 +254,29 @@ Handlebars.registerHelper('calcRankThenScore', function(profileName) {
 		}
 	});
 	Session.set(profileName+'Array', arrScore);
+console.log('from registeredHelper: '+arrScore)
 });
 
 Handlebars.registerHelper('editing', function() {
 	return Session.equals('editing',this._id)
 });
 
-Handlebars.registerHelper("matchGMCashRank", function(item) {
-	var gmCashId;
+Handlebars.registerHelper("matchIdToRank", function(profileName, item) {
+console.log('*** match called');
+	var Id;
 
 	if (item === undefined) {
-		GMCashId = this._id;
+		Id = this._id;
 	} else { 
-		GMCashId = item;
+		Id = item;
 	}
 
-	var arrGMCashId = Session.get('gmCashArray');
-	for (i=0; i < arrGMCashId.length; ++i) {
-		if (GMCashId == arrGMCashId[i][0]) {
-			Session.set('gmCashRank', arrGMCashId[i][1])
-			return arrGMCashId[i][1];
+	var arrId = Session.get(profileName+'Array');
+	for (i=0; i < arrId.length; ++i) {
+		if (Id == arrId[i][0]) {
+			Session.set(profileName+'Rank', arrId[i][1]);
+console.log('from match: '+arrId[i][1]);
+			return arrId[i][1];
 		}
 	}
 });
@@ -333,3 +340,41 @@ var convertRank = function (numRank) {
 		return 'D'
 	}
 }
+/*
+var xxx = function (profileName) {
+console.log('*** function called');
+	var profileColl = Profile.find({type: profileName}).fetch();
+	var customerColl = Customers.find().fetch();
+	var customerTotal = 0;
+	var runningTotal = 0;
+
+	customerColl = _.chain(customerColl).sortBy(profileName).reverse().value();
+
+	var customerValues = _.pluck(customerColl, profileName);
+	for (i=0; i < customerValues.length; ++i) {
+		customerTotal = (customerTotal + customerValues[i]);
+	}
+
+	var arrScore = [];
+	var strVal;
+
+	_.each(customerValues, function (num, i) {
+		if (runningTotal <= (customerTotal * (profileColl[0].A/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'A']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'B']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B + profileColl[0].C)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'C']);
+		} else if (runningTotal <= (customerTotal * ((profileColl[0].A + profileColl[0].B + profileColl[0].C + profileColl[0].D)/100))) {
+			runningTotal = (runningTotal + customerValues[i]);
+			arrScore.push([customerColl[i]._id,'D']);
+		}
+	});
+
+	Session.set(profileName+'Array', arrScore);
+console.log('from function: '+arrScore);
+}
+*/
